@@ -58,10 +58,10 @@ def voice(update: Update, _: CallbackContext):
 
 def send_voice(update: Update, _: CallbackContext):
     text = update.message.text
-    obj = gTTS(text=text, lang='en', slow=False)
-    voice = obj.save('text2voice.ogg')
+    voice = gTTS(text=text, lang='en', slow=False)
+    voice = voice.save('text2voice.ogg')
+    voice = open('text2voice.ogg', 'rb')
     update.message.reply_voice(voice=voice)
-
 
 def maxn(update: Update, _: CallbackContext):
     update.message.reply_text(text='آرایه های عددی به صورت زیر وارد کید تا بیشترین مقدار چاپ شود\n\n'
