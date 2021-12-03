@@ -1,2 +1,1 @@
-worker: python TweeTab.py
-web: python TweeTab.py
+worker: python bot.py
