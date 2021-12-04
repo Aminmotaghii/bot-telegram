@@ -21,7 +21,7 @@ GET_BORN_DATE, GET_EN_TEXT, MAX_ARRAY = range(3)
 logging.basicConfig(format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
                     level=logging.INFO)
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger(_name_)
 
 
 def error(update, context):
@@ -38,17 +38,21 @@ def age(update: Update, _: CallbackContext):
 
 
 def send_age(update: Update, _: CallbackContext):
-    year = int(update.message.text.split()[0])
-    month = int(update.message.text.split()[1])
-    day = int(update.message.text.split()[2])
-    age = str(JalaliDatetime.now() - JalaliDate(year, month, day)).split()[0]
-    age_Y = int(age) // 365
-    age_M = (int(age) - (365 * age_Y)) // 30
-    age_D = int(age) - age_Y * 365 - age_M * 30
-    update.message.reply_text(text='سن شما:\n\n' +
-                                   str(age_Y) + ' سال و ' +
-                                   str(age_M) + ' ماه و ' +
-                                   str(age_D) + ' روز ')
+    if len(update.message.text.split()) == 3 :
+        year = int(update.message.text.split()[0])
+        month = int(update.message.text.split()[1])
+        day = int(update.message.text.split()[2])
+        age = str(JalaliDatetime.now() - JalaliDate(year, month, day)).split()[0]
+        age_Y = int(age) // 365
+        age_M = (int(age) - (365 * age_Y)) // 30
+        age_D = int(age) - age_Y * 365 - age_M * 30
+        update.message.reply_text(text='سن شما:\n\n' +
+                                       str(age_Y) + ' سال و ' +
+                                       str(age_M) + ' ماه و ' +
+                                       str(age_D) + ' روز ')
+    else:
+        update.message.reply_text(text='فرمت نادرست\nتاریخ تولدت رو دوباره به صورت زیر برام بفرس.\n\nمثال: 1400 12 12')
+        return GET_BORN_DATE
 
 
 def voice(update: Update, _: CallbackContext):
@@ -59,9 +63,10 @@ def voice(update: Update, _: CallbackContext):
 def send_voice(update: Update, _: CallbackContext):
     text = update.message.text
     voice = gTTS(text=text, lang='en', slow=False)
-    voice = voice.save('text2voice.ogg')
+    voice.save('text2voice.ogg')
     voice = open('text2voice.ogg', 'rb')
     update.message.reply_voice(voice=voice)
+
 
 def maxn(update: Update, _: CallbackContext):
     update.message.reply_text(text='آرایه های عددی به صورت زیر وارد کید تا بیشترین مقدار چاپ شود\n\n'
@@ -70,14 +75,12 @@ def maxn(update: Update, _: CallbackContext):
 
 
 def send_max(update: Update, _: CallbackContext):
-    global maxi
     list = update.message.text.split()
     a = []
-
-    for i in list:
-        b = a.append(int(i))
-        maxi = max(b)
-    update.message.reply_text(text='بزرگترین عدد: ' + str(maxi))
+    for number in list:
+        a.append(int(number))
+    maximum = max(a)
+    update.message.reply_text(text='بزرگترین عدد: ' + str(maximum))
 
 
 def main():
@@ -90,19 +93,22 @@ def main():
                       CommandHandler('max', maxn)],
         states={
             GET_BORN_DATE:
-                [MessageHandler(~Filters.regex('^(/start|/age|/max)$'), send_age),
+                [MessageHandler(Filters.regex('[0-9]') & ~Filters.command, send_age),
                  CommandHandler('start', start),
                  CommandHandler('age', age),
+                 CommandHandler('voice', voice),
                  CommandHandler('max', maxn)],
             GET_EN_TEXT:
-                [MessageHandler(~Filters.regex('^(/start|/age|/max)$'), send_voice),
+                [MessageHandler(Filters.text & ~Filters.command, send_voice),
                  CommandHandler('start', start),
                  CommandHandler('age', age),
+                 CommandHandler('voice', voice),
                  CommandHandler('max', maxn)],
             MAX_ARRAY:
-                [MessageHandler(~Filters.regex('^(/start|/age|/max)$'), send_max),
+                [MessageHandler(Filters.regex('[0-9]') & ~Filters.command, send_max),
                  CommandHandler('start', start),
                  CommandHandler('age', age),
+                 CommandHandler('voice', voice),
                  CommandHandler('max', maxn)]},
         fallbacks=[CommandHandler('start', start)])
 
@@ -120,5 +126,5 @@ def main():
     updater.idle()
 
 
-if __name__ == '__main__':
+if _name_ == '_main_':
     main()
