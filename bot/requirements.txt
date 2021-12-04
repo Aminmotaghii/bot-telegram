@@ -1,3 +1,5 @@
 python-telegram-bot
 khayyam
+qrcode
 gtts
+Pillow
